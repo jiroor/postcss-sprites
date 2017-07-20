@@ -165,6 +165,20 @@ export function extractImages(root, opts, result) {
 			image.originalUrl = imageUrl[0];
 			image.url = imageUrl[1];
 
+			let included = true;
+			if (_.isFunction(opts.filter)) {
+				included = opts.filter(image);
+			} else if (_.isString(opts.filter)) {
+				var regFilter = new RegExp(opts.filter);
+				included = regFilter.test(image.url);
+			} else if (_.isRegExp(opts.filter)) {
+				included = opts.filter.test(image.url);
+			}
+
+			if (!included) {
+				return;
+			}
+
 			if (isImageSupported(image.url)) {
 				// Search for retina images
 				if (opts.retina && isRetinaImage(image.url)) {
